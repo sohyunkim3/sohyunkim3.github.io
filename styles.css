@@ -27,8 +27,7 @@ img, svg { display: block; max-width: 100%; }
 .site-header nav a:hover, .site-header nav a[aria-current] { color: var(--accent); }
 .about { display: grid; grid-template-columns: minmax(0, 1fr) 180px; gap: 64px; align-items: start; padding: 64px 0 52px; }
 .bio, .intro-heading { min-width: 0; }
-.affiliation { color: var(--muted); font-size: 12px; letter-spacing: .15px; line-height: 1.7; }
-h1 { margin: 9px 0 4px; color: #1e2d35; font-size: 48px; line-height: 1.2; font-weight: 650; letter-spacing: -1.7px; }
+h1 { margin: 0 0 4px; color: #1e2d35; font-size: 48px; line-height: 1.2; font-weight: 650; letter-spacing: -1.7px; }
 .role { color: var(--accent); font-size: 15px; }
 .research-intro { color: var(--body); max-width: 660px; margin-top: 25px; font-size: 16px; line-height: 1.9; }
 .research-intro p + p { margin-top: 12px; }
@@ -133,8 +132,7 @@ footer span { padding: 0 5px; color: #bac1c5; }
   .about { grid-template-columns: minmax(0, 1fr) 100px; column-gap: 20px; row-gap: 23px; padding-block: 32px 36px; }
   .bio { display: contents; }
   .intro-heading { grid-column: 1; grid-row: 1; align-self: center; }
-  .affiliation { font-size: 11px; }
-  h1 { font-size: 32px; margin-block: 9px 6px; letter-spacing: -1px; }
+  h1 { font-size: 32px; margin-block: 0 6px; letter-spacing: -1px; }
   .role { font-size: 13px; }
   .portrait-block { grid-column: 2; grid-row: 1; padding-top: 0; }
   .portrait-block img { width: 100px; height: 128px; border-radius: 4px; }
