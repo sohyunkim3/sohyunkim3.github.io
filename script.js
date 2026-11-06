@@ -129,7 +129,8 @@ for (const paper of document.querySelectorAll('.publication, .award-list li')) {
   zoom.textContent = '↗';
   link.append(image, zoom);
   figure.append(link);
-  paper.prepend(figure);
+  if (isPublication) paper.append(figure);
+  else paper.prepend(figure);
   paper.classList.add('has-image');
 
   image.addEventListener('load', () => {
