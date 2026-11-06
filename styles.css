@@ -31,6 +31,7 @@ img, svg { display: block; max-width: 100%; }
 h1 { margin: 9px 0 4px; color: #1e2d35; font-size: 48px; line-height: 1.2; font-weight: 650; letter-spacing: -1.7px; }
 .role { color: var(--accent); font-size: 15px; }
 .research-intro { color: var(--body); max-width: 660px; margin-top: 25px; font-size: 16px; line-height: 1.9; }
+.research-intro p + p { margin-top: 12px; }
 .profile-links { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 24px; }
 .profile-links a { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; width: 44px; height: 44px; border: 1px solid #e8edef; border-radius: 7px; background: var(--soft); }
 .profile-links a:hover { background: #eaf1f3; border-color: #c7d8dd; text-decoration: none; }
