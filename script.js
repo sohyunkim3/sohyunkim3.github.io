@@ -56,9 +56,13 @@ if ('IntersectionObserver' in window) {
 let figureViewer;
 let viewerImage;
 let viewerTitle;
+let viewerDetails;
+let viewerAbstractHeading;
+let viewerAbstract;
+let viewerPaperLink;
 let lastFigureLink;
 
-function openFigure(event, link, image, title) {
+function openFigure(event, link, image, title, paper) {
   if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
   if (!('HTMLDialogElement' in window) || typeof HTMLDialogElement.prototype.showModal !== 'function') return;
   event.preventDefault();
@@ -78,8 +82,39 @@ function openFigure(event, link, image, title) {
     close.textContent = '×';
     close.addEventListener('click', () => figureViewer.close());
     toolbar.append(viewerTitle, close);
+
+    const content = document.createElement('div');
+    content.className = 'viewer-content';
+    const figure = document.createElement('figure');
+    figure.className = 'viewer-figure';
     viewerImage = document.createElement('img');
-    figureViewer.append(toolbar, viewerImage);
+    figure.append(viewerImage);
+    viewerDetails = document.createElement('section');
+    viewerDetails.className = 'viewer-details';
+    viewerDetails.setAttribute('aria-labelledby', 'viewer-abstract-heading');
+    viewerDetails.hidden = true;
+    viewerAbstractHeading = document.createElement('h2');
+    viewerAbstractHeading.id = 'viewer-abstract-heading';
+    viewerAbstractHeading.textContent = 'Abstract';
+    viewerAbstract = document.createElement('div');
+    viewerAbstract.className = 'viewer-abstract';
+    viewerPaperLink = document.createElement('a');
+    viewerPaperLink.className = 'viewer-paper-link';
+    viewerPaperLink.target = '_blank';
+    viewerPaperLink.rel = 'noopener';
+    viewerPaperLink.textContent = 'Read paper ↗';
+    viewerPaperLink.hidden = true;
+    const trackPaperClick = event => {
+      if (event.type === 'click' && event.button !== 0) return;
+      if (event.type === 'auxclick' && event.button !== 1) return;
+      const paperSlug = event.currentTarget.dataset.paperSlug;
+      if (paperSlug) sendSiteEvent('publication_click', { paper_slug: paperSlug });
+    };
+    viewerPaperLink.addEventListener('click', trackPaperClick);
+    viewerPaperLink.addEventListener('auxclick', trackPaperClick);
+    viewerDetails.append(viewerAbstractHeading, viewerAbstract, viewerPaperLink);
+    content.append(figure, viewerDetails);
+    figureViewer.append(toolbar, content);
     document.body.append(figureViewer);
 
     figureViewer.addEventListener('click', click => {
@@ -92,6 +127,14 @@ function openFigure(event, link, image, title) {
     figureViewer.addEventListener('close', () => {
       document.body.classList.remove('figure-is-open');
       viewerImage.removeAttribute('src');
+      viewerImage.removeAttribute('alt');
+      viewerAbstract.replaceChildren();
+      viewerAbstractHeading.textContent = 'Abstract';
+      viewerDetails.hidden = true;
+      viewerPaperLink.removeAttribute('href');
+      delete viewerPaperLink.dataset.paperSlug;
+      viewerPaperLink.hidden = true;
+      figureViewer.classList.remove('is-publication');
       lastFigureLink?.focus({ preventScroll: true });
     });
   }
@@ -100,7 +143,25 @@ function openFigure(event, link, image, title) {
   viewerTitle.textContent = title;
   viewerImage.src = image.src;
   viewerImage.alt = image.alt;
+  const abstract = paper.matches('.publication') ? paper.querySelector('template.publication-abstract') : null;
+  const hasAbstract = Boolean(abstract?.content.textContent.trim());
+  viewerAbstract.replaceChildren();
+  viewerAbstractHeading.textContent = abstract?.dataset.label?.trim() || 'Abstract';
+  viewerDetails.hidden = !hasAbstract;
+  figureViewer.classList.toggle('is-publication', hasAbstract);
+  const paperLink = hasAbstract ? paper.querySelector('.publication-body h3 a') : null;
+  viewerPaperLink.hidden = !paperLink;
+  viewerPaperLink.removeAttribute('href');
+  delete viewerPaperLink.dataset.paperSlug;
+  if (hasAbstract) viewerAbstract.append(abstract.content.cloneNode(true));
+  if (paperLink) {
+    viewerPaperLink.href = paperLink.href;
+    const paperSlug = paper.dataset.paperSlug?.trim();
+    if (paperSlug) viewerPaperLink.dataset.paperSlug = paperSlug;
+  }
   figureViewer.showModal();
+  figureViewer.scrollTop = 0;
+  viewerDetails.scrollTop = 0;
   document.body.classList.add('figure-is-open');
 }
 
@@ -117,8 +178,10 @@ for (const paper of document.querySelectorAll('.publication, .award-list li')) {
   link.href = source;
   link.target = '_blank';
   link.rel = 'noopener';
-  link.setAttribute('aria-label', `${isPublication ? 'Enlarge figure' : 'View certificate'}: ${title}`);
-  link.title = isPublication ? 'Enlarge figure' : 'View certificate';
+  const hasAbstract = isPublication && Boolean(paper.querySelector('template.publication-abstract')?.content.textContent.trim());
+  const actionLabel = hasAbstract ? 'View figure and abstract' : isPublication ? 'Enlarge figure' : 'View certificate';
+  link.setAttribute('aria-label', `${actionLabel}: ${title}`);
+  link.title = actionLabel;
   const image = document.createElement('img');
   image.alt = paper.dataset.imageAlt?.trim() || `Figure for ${title}`;
   image.loading = 'lazy';
@@ -141,6 +204,6 @@ for (const paper of document.querySelectorAll('.publication, .award-list li')) {
     figure.remove();
     paper.classList.remove('has-image');
   }, { once: true });
-  link.addEventListener('click', event => openFigure(event, link, image, title));
+  link.addEventListener('click', event => openFigure(event, link, image, title, paper));
   image.src = source;
 }
