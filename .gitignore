@@ -1,17 +1,3 @@
-# Original CV source and LaTeX working files stay on this computer.
-CV/
-# Original figure backups stay local in a single archive.
-.archive/
-*.aux
-*.log
-*.out
-*.synctex.gz
-*.fdb_latexmk
-*.fls
-
-# Local preview, packages, and operating-system files.
-node_modules/
-.preview/
+# Operating-system generated files.
 .DS_Store
 Thumbs.db
-*.zip
